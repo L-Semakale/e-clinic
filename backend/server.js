@@ -1,29 +1,23 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const dotenv = require("dotenv");
 const cors = require("cors");
-const userRoutes = require("./routes/userRoutes");
 
+const authRoutes = require("./routes/authRoutes"); // Ensure correct path
 
-// Import Routes
-const authRoutes = require("./routes/authRoutes");
-
-dotenv.config();
 const app = express();
 
 // Middleware
-app.use(express.json());
+app.use(express.json()); // Parses incoming JSON data
 app.use(cors());
 
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/users", userRoutes);
 
+mongoose.connect("mongodb://127.0.0.1:27017/eclinic", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+    .then(() => console.log("MongoDB connected"))
+    .catch(err => console.log("MongoDB connection error:", err));
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, { dbName: "e-clinic" })
-    .then(() => console.log("Connected to MongoDB"))
-    .catch(err => console.error("MongoDB Connection Error:", err));
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(5000, () => console.log("Server running on port 5000"));
