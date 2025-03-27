@@ -1,12 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import logo from "../assets/logo.png"; // Remove .png if unnecessary
-const logo = require("../assets/logo.png");
+import logo from '../../assets/logo.png'; 
 
 const LaunchScreen = () => {
   return (
     <div style={styles.container}>
-      <img src="../assets/logo.png" alt="E-Clinic Logo" style={styles.logo} />
+      <img src={logo} alt="Logo" />
       <h1 style={styles.title}>E-Clinic</h1>
       <p style={styles.subtitle}>Discover the best way to manage your health today</p>
 

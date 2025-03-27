@@ -1,147 +1,113 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { TextInput, Button, Checkbox } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Form, Button, Container, Row, Col } from 'react-bootstrap';
+import { FaGoogle, FaFacebook } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 
 const SignUpScreen = () => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState('');
   const [checked, setChecked] = useState(false);
+  const [error, setError] = useState('');
+  
+  const navigate = useNavigate(); // Hook for navigation
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    // Basic form validation
+    if (!email || !phone || !role || !checked) {
+      setError('Please fill all fields and agree to the terms.');
+      return;
+    }
+
+    // Simulate API call and registration process
+    // Replace this with actual API call logic
+    setError(''); // Reset error if all fields are valid
+
+    // Redirect to the appropriate dashboard based on the role
+    if (role === 'patient') {
+      navigate('/patient-dashboard'); // Redirect to Patient Dashboard
+    } else if (role === 'doctor') {
+      navigate('/doctor-dashboard'); // Redirect to Doctor Dashboard
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create Account</Text>
-      <Text style={styles.subtitle}>Create your account to manage your health easily</Text>
+    <Container className="mt-5">
+      <Row className="justify-content-center">
+        <Col md={6}>
+          <h2 className="text-center">Create Account</h2>
+          <p className="text-center text-muted">Manage your health easily</p>
 
-      <TextInput
-        mode="outlined"
-        label="Your email address"
-        left={<TextInput.Icon icon="email-outline" />}
-        value={email}
-        onChangeText={setEmail}
-        style={styles.input}
-      />
+          {/* Show error if validation fails */}
+          {error && <p className="text-danger text-center">{error}</p>}
 
-      <TextInput
-        mode="outlined"
-        label="Your phone number"
-        left={<TextInput.Icon icon="phone-outline" />}
-        value={phone}
-        onChangeText={setPhone}
-        style={styles.input}
-      />
+          <Form onSubmit={handleSubmit}>
+            <Form.Group controlId="email">
+              <Form.Label>Email address</Form.Label>
+              <Form.Control
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </Form.Group>
 
-      <TextInput
-        mode="outlined"
-        label="Patient or Doctor"
-        left={<TextInput.Icon icon="account-outline" />}
-        value={role}
-        onChangeText={setRole}
-        style={styles.input}
-      />
+            <Form.Group controlId="phone">
+              <Form.Label>Phone Number</Form.Label>
+              <Form.Control
+                type="tel"
+                placeholder="Enter your phone number"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </Form.Group>
 
-      <View style={styles.checkboxContainer}>
-        <Checkbox
-          status={checked ? 'checked' : 'unchecked'}
-          onPress={() => setChecked(!checked)}
-        />
-        <Text>I agree with Terms & Conditions</Text>
-      </View>
+            <Form.Group controlId="role">
+              <Form.Label>Are you a Patient or Doctor?</Form.Label>
+              <Form.Control
+                as="select"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+              >
+                <option value="">Select...</option>
+                <option value="patient">Patient</option>
+                <option value="doctor">Doctor</option>
+              </Form.Control>
+            </Form.Group>
 
-      <Button mode="contained" style={styles.registerButton}>
-        Register
-      </Button>
+            <Form.Group controlId="terms">
+              <Form.Check
+                type="checkbox"
+                label="I agree with Terms & Conditions"
+                checked={checked}
+                onChange={() => setChecked(!checked)}
+              />
+            </Form.Group>
 
-      <View style={styles.dividerContainer}>
-        <View style={styles.divider} />
-        <Text style={styles.orText}>Or</Text>
-        <View style={styles.divider} />
-      </View>
+            <Button variant="primary" className="w-100" type="submit">
+              Register
+            </Button>
+          </Form>
 
-      <TouchableOpacity style={[styles.socialButton, { backgroundColor: '#DD4B39' }]}>
-        <Icon name="google" size={20} color="white" />
-        <Text style={styles.socialText}>Continue with Google</Text>
-      </TouchableOpacity>
+          <div className="text-center my-3">Or</div>
 
-      <TouchableOpacity style={[styles.socialButton, { backgroundColor: '#1877F2' }]}>
-        <Icon name="facebook" size={20} color="white" />
-        <Text style={styles.socialText}>Continue with Facebook</Text>
-      </TouchableOpacity>
+          <Button variant="danger" className="w-100 mb-2">
+            <FaGoogle /> Continue with Google
+          </Button>
 
-      <TouchableOpacity style={styles.loginTextContainer}>
-        <Text>Already registered? </Text>
-        <Text style={styles.loginText}>Log In</Text>
-      </TouchableOpacity>
-    </View>
+          <Button variant="primary" className="w-100">
+            <FaFacebook /> Continue with Facebook
+          </Button>
+
+          <p className="text-center mt-3">
+            Already registered? <a href="/login">Log In</a>
+          </p>
+        </Col>
+      </Row>
+    </Container>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 5,
-  },
-  subtitle: {
-    fontSize: 14,
-    textAlign: 'center',
-    color: 'gray',
-    marginBottom: 20,
-  },
-  input: {
-    marginBottom: 10,
-  },
-  checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  registerButton: {
-    backgroundColor: '#00BFFF',
-    paddingVertical: 5,
-  },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 15,
-  },
-  divider: {
-    flex: 1,
-    height: 1,
-    backgroundColor: 'gray',
-  },
-  orText: {
-    marginHorizontal: 10,
-    color: 'gray',
-  },
-  socialButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    borderRadius: 5,
-    marginVertical: 5,
-  },
-  socialText: {
-    color: 'white',
-    marginLeft: 10,
-  },
-  loginTextContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 15,
-  },
-  loginText: {
-    color: '#00BFFF',
-    fontWeight: 'bold',
-  },
-});
 
 export default SignUpScreen;
