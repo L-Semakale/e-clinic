@@ -1,72 +1,63 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
-const Login = () => {
+const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
+  const [error, setError] = useState("");
+
+  const navigate = useNavigate(); // Navigation hook
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", { email, password });
+      const response = await fetch("http://localhost:5000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-      // Only store credentials AFTER successful login
-      sessionStorage.setItem("token", res.data.token);
-      sessionStorage.setItem("role", res.data.role);
+      if (!response.ok) {
+        throw new Error("Invalid credentials");
+      }
 
-      // Redirect based on user role
-      if (res.data.role === "patient") {
+      const data = await response.json();
+
+      // Check user role (Assuming the API response contains a role field)
+      if (data.role === "patient") {
         navigate("/patient-dashboard");
-      } else if (res.data.role === "doctor") {
+      } else if (data.role === "doctor") {
         navigate("/doctor-dashboard");
       } else {
-        navigate("/admin-dashboard");
+        setError("Invalid role, please contact support.");
       }
-    } catch (error) {
-      setError(error.response?.data?.message || "Invalid email or password.");
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      setError(err.message);
     }
   };
 
   return (
-    <div className="container mt-5">
-      <h2 className="text-center">Login</h2>
-      <form onSubmit={handleLogin} className="mt-3">
-        {error && <div className="alert alert-danger">{error}</div>}
-        <div className="mb-3">
-          <input
-            type="email"
-            className="form-control"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div className="mb-3">
-          <input
-            type="password"
-            className="form-control"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit" className="btn btn-primary w-100" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
-        </button>
+    <div>
+      <h2>Login</h2>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      <form onSubmit={handleLogin}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button type="submit">Login</button>
       </form>
     </div>
   );
 };
 
-export default Login;
+export default LoginScreen;
