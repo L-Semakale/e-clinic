@@ -1,34 +1,39 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-const LoginScreen = () => {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const navigate = useNavigate(); // Navigation hook
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
+  
     try {
       const response = await fetch("http://localhost:5000/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-
+  
       if (!response.ok) {
         throw new Error("Invalid credentials");
       }
-
+  
       const data = await response.json();
-
-      // Check user role (Assuming the API response contains a role field)
+  
+      // Store user info in localStorage
+      localStorage.setItem("userRole", data.role);
+  
+      // Redirect user based on role
       if (data.role === "patient") {
         navigate("/patient-dashboard");
       } else if (data.role === "doctor") {
         navigate("/doctor-dashboard");
+      } else if (data.role === "admin") {
+        navigate("/admin-dashboard");
       } else {
         setError("Invalid role, please contact support.");
       }
@@ -36,28 +41,53 @@ const LoginScreen = () => {
       setError(err.message);
     }
   };
+  
 
   return (
-    <div>
-      <h2>Login</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit">Login</button>
-      </form>
+    <div className="container d-flex justify-content-center align-items-center vh-100">
+      <div className="card p-4 shadow" style={{ width: "350px" }}>
+        <h3 className="text-center">Access Account</h3>
+        <p className="text-muted text-center">Log in to manage your appointments</p>
+
+        {error && <p className="text-danger text-center">{error}</p>}
+
+        <form onSubmit={handleLogin}>
+          <div className="mb-3">
+            <input
+              type="email"
+              className="form-control"
+              placeholder="Your email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <input
+              type="password"
+              className="form-control"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="text-end">
+            <Link to="/forgot-password" className="text-primary">
+              Forgot your password?
+            </Link>
+          </div>
+
+          <button type="submit" className="btn btn-primary w-100 mt-3">Log In</button>
+        </form>
+
+        <p className="mt-3 text-center">
+          Need to create an account? <Link to="/signup" className="text-primary">Sign Up</Link>
+        </p>
+      </div>
     </div>
   );
 };
 
-export default LoginScreen;
+export default Login;
